@@ -190,6 +190,14 @@
 			clock-frequency= <133000000>;
 			clock-output-names = "clk_ext4";
 		};
+
+		mcp251x_clock: clock@6 {
+			compatible = "fixed-clock";
+			reg = <7>;
+			#clock-cells = <0>;
+			clock-frequency = <20000000>;
+			clock-output-names = "mcp251x_clock";
+   		};
 	};
 
 	power-domains {

@@ -37,6 +37,20 @@
 		};
 	};
 
+	vuart {
+		compatible = "vuart";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_vuart>;
+		gpio-controller;
+		rx-gpio = <&gpio5 28 GPIO_ACTIVE_LOW>;
+		tx-gpio = <&gpio5 29 GPIO_ACTIVE_LOW>;
+		interrupt-parent = <&gpio5>;
+		//interrupt-parent = <&gic>;
+		//interrupt-controller;
+		//interrupts = <GIC_SPI 156 IRQ_TYPE_EDGE_FALLING>;
+     	interrupts = <28 IRQ_TYPE_EDGE_FALLING>;
+	};
+
 	modem_reset: modem-reset {
 		compatible = "gpio-reset";
 		reset-gpios = <&gpio2 6 GPIO_ACTIVE_LOW>;
@@ -45,12 +59,13 @@
 		#reset-cells = <0>;
 	};
 
-	ir_recv: ir-receiver {
+	/*ir_recv: ir-receiver {
 		compatible = "gpio-ir-receiver";
 		gpios = <&gpio1 13 GPIO_ACTIVE_LOW>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_ir_recv>;
 	};
+	*/
 
 	regulators {
 		compatible = "simple-bus";
@@ -160,7 +175,7 @@
 			>;
 		};
 
-		pinctrl_ir_recv: ir_recv {
+		/*pinctrl_ir_recv: ir_recv {
 			fsl,pins = <
 				MX8MM_IOMUXC_GPIO1_IO13_GPIO1_IO13		0x14f
 			>;
@@ -172,12 +187,15 @@
 				MX8MM_IOMUXC_GPIO1_IO14_CCMSRCGPCMIX_CLKO1	0x59
 			>;
 		};
-
+		
+		*/
 		pinctrl_mipi_dsi_en: mipi_dsi_en {
 			fsl,pins = <
-				MX8MM_IOMUXC_GPIO1_IO08_GPIO1_IO8		0x16
+				//MX8MM_IOMUXC_GPIO1_IO08_GPIO1_IO8		0x16
 			>;
 		};
+		
+		
 
 		pinctrl_i2c2_synaptics_dsx_io: synaptics_dsx_iogrp {
 			fsl,pins = <
@@ -201,7 +219,9 @@
 				MX8MM_IOMUXC_ENET_RXC_ENET1_RGMII_RXC	0x91
 				MX8MM_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL	0x91
 				MX8MM_IOMUXC_ENET_TX_CTL_ENET1_RGMII_TX_CTL	0x1f
-				MX8MM_IOMUXC_SAI2_RXC_GPIO4_IO22	0x19
+				//MX8MM_IOMUXC_SAI2_RXC_GPIO4_IO22	0x19
+				MX8MM_IOMUXC_SAI5_MCLK_GPIO3_IO25	0x19
+				
 			>;
 		};
 
@@ -219,6 +239,13 @@
 		pinctrl_gpio_led: gpioledgrp {
 			fsl,pins = <
 				MX8MM_IOMUXC_NAND_READY_B_GPIO3_IO16	0x19
+			>;
+		};
+
+		pinctrl_gpio_vuart: gpiovuartgrp {
+			fsl,pins = <
+				MX8MM_IOMUXC_UART4_RXD_GPIO5_IO28	0x19
+				MX8MM_IOMUXC_UART4_TXD_GPIO5_IO29 	0x19
 			>;
 		};
 
@@ -366,7 +393,7 @@
 				MX8MM_IOMUXC_ECSPI1_SCLK_UART3_DCE_RX		0x140
 				MX8MM_IOMUXC_ECSPI1_MOSI_UART3_DCE_TX		0x140
 				MX8MM_IOMUXC_ECSPI1_SS0_UART3_DCE_RTS_B		0x140
-				MX8MM_IOMUXC_ECSPI1_MISO_UART3_DCE_CTS_B	0x140
+				//MX8MM_IOMUXC_ECSPI1_MISO_UART3_DCE_CTS_B	0x140
 			>;
 		};
 
@@ -408,13 +435,14 @@
 				MX8MM_IOMUXC_SD1_DATA3_USDHC1_DATA3	0x1d6
 			>;
 		};
-
+		
 		pinctrl_usdhc2_gpio: usdhc2grpgpio {
 			fsl,pins = <
-				MX8MM_IOMUXC_GPIO1_IO15_GPIO1_IO15	0x1c4
+				//MX8MM_IOMUXC_GPIO1_IO15_GPIO1_IO15	0x1c4
 				MX8MM_IOMUXC_SD2_RESET_B_GPIO2_IO19	0x41
 			>;
 		};
+		
 
 		pinctrl_usdhc2: usdhc2grp {
 			fsl,pins = <
@@ -505,9 +533,24 @@
 				MX8MM_IOMUXC_GPIO1_IO02_WDOG1_WDOG_B		0xc6
 			>;
 		};
+
+		pinctrl_ecspi2: ecspi2grp {
+			fsl,pins = <
+				MX8MM_IOMUXC_ECSPI2_SCLK_ECSPI2_SCLK	0x00001916
+				MX8MM_IOMUXC_ECSPI2_SS0_GPIO5_IO13		0x00000116
+				MX8MM_IOMUXC_ECSPI2_MOSI_ECSPI2_MOSI	0x00000116
+				MX8MM_IOMUXC_ECSPI2_MISO_ECSPI2_MISO    0x00000116
+			>;
+		};
+
+		pinctrl_mcp2518_irq: mcp2518irq {
+			fsl,pins = <
+				MX8MM_IOMUXC_ECSPI1_MISO_GPIO5_IO8		0x11
+			>;
+		};
 	};
 };
-
+/*
 &csi1_bridge {
 	fsl,mipi-mode;
 	status = "okay";
@@ -516,7 +559,7 @@
 			remote-endpoint = <&csi1_mipi_ep>;
 		};
 	};
-};
+};*/
 
 &flexspi {
 	pinctrl-names = "default";
@@ -734,7 +777,7 @@
 	};
 };
 
-
+/*
 &mipi_csi_1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -752,7 +795,7 @@
 			remote-endpoint = <&csi1_ep>;
 		};
 	};
-};
+};*/
 
 &i2c3 {
 	clock-frequency = <100000>;
@@ -796,7 +839,7 @@
 		AVDD-supply = <&reg_audio_board>;
 		DVDD-supply = <&reg_audio_board>;
 	};
-
+/*
 	ov5640_mipi: ov5640_mipi@3c {
 		compatible = "ovti,ov5640_mipi";
 		reg = <0x3c>;
@@ -819,6 +862,7 @@
 			};
 		};
 	};
+*/
 };
 
 &lcdif {
@@ -955,23 +999,23 @@
 	assigned-clocks = <&clk IMX8MM_CLK_UART3_SRC>;
 	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
 	fsl,uart-has-rtscts;
-	status = "okay";
+	status = "disable";
 };
 
 &usbotg1 {
-	dr_mode = "otg";
-	extcon = <0>, <&typec1_ptn5110>;
+	dr_mode = "host";
+	//extcon = <0>, <&typec1_ptn5110>; /* hyt close */
 	picophy,pre-emp-curr-control = <3>;
 	picophy,dc-vol-level-adjust = <7>;
 	status = "okay";
 };
 
 &usbotg2 {
-	dr_mode = "otg";
-	extcon = <0>, <&typec2_ptn5110>;
+	dr_mode = "host";
+	//extcon = <0>, <&typec2_ptn5110>;	/* hyt close */
 	picophy,pre-emp-curr-control = <3>;
 	picophy,dc-vol-level-adjust = <7>;
-	status = "disabled";
+	status = "okay";
 };
 
 &usdhc1 {
@@ -987,6 +1031,8 @@
 	status = "okay";
 };
 
+/*
+hyt close
 &usdhc2 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
@@ -997,6 +1043,9 @@
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	status = "okay";
 };
+*/
+
+
 
 &usdhc3 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
@@ -1042,4 +1091,22 @@
 	assigned-clock-parents = <&clk IMX8MM_AUDIO_PLL1_OUT>;
 	assigned-clock-rates = <0>, <196608000>;
 	status = "okay";
+};
+
+&ecspi2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi2>;
+	cs-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	spidev0: mcp2515@0 {
+		compatible = "microchip,mcp2518fd";
+      	reg = <0>;
+      	pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mcp2518_irq>;
+     	clocks = <&mcp251x_clock>;
+     	interrupt-parent = <&gpio5>;
+     	interrupts = <8 IRQ_TYPE_LEVEL_LOW>;
+     	spi-max-frequency = <20000000>;
+	};
 };
