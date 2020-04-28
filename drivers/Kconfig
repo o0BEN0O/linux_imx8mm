@@ -211,4 +211,9 @@ source "drivers/tee/Kconfig"
 
 source "drivers/mux/Kconfig"
 
+config GPIO_TO_UART
+	tristate "GPIO_TO_UART"
+	---help---
+	  Driver for GPIO simulate uart_driver rx data
+
 endmenu
