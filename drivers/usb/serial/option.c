@@ -1081,7 +1081,19 @@ static const struct usb_device_id option_ids[] = {
 	{ USB_DEVICE(QUALCOMM_VENDOR_ID, UBLOX_PRODUCT_R410M),
 	  .driver_info = RSVD(1) | RSVD(3) },
 	/* Quectel products using Quectel vendor ID */
-	{ USB_DEVICE(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EC21),
+#if 1 //added by Quectel 2019-11-5
+  { USB_DEVICE(0x05C6, 0x9090) }, /* Quectel UC15 */ 
+  { USB_DEVICE(0x05C6, 0x9003) }, /* Quectel UC20 */ 
+  { USB_DEVICE(0x2C7C, 0x0125) }, /* Quectel EC25 */ 
+  { USB_DEVICE(0x2C7C, 0x0121) }, /* Quectel EC21 */ 
+  { USB_DEVICE(0x05C6, 0x9215) }, /* Quectel EC20 */ 
+  { USB_DEVICE(0x2C7C, 0x0191) }, /* Quectel EG91 */ 
+  { USB_DEVICE(0x2C7C, 0x0195) }, /* Quectel EG95 */ 
+  { USB_DEVICE(0x2C7C, 0x0306) }, /* Quectel EG06/EP06/EM06 */ 
+	{ USB_DEVICE(0x2C7C, 0x0296) }, /* Quectel BG96 */ 
+	{ USB_DEVICE(0x2C7C, 0x0435) }, /* Quectel AG35 */ 
+#else
+		{ USB_DEVICE(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EC21),
 	  .driver_info = RSVD(4) },
 	{ USB_DEVICE(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EC25),
 	  .driver_info = RSVD(4) },
@@ -1090,6 +1102,9 @@ static const struct usb_device_id option_ids[] = {
 	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EP06, 0xff, 0xff, 0xff),
 	  .driver_info = RSVD(1) | RSVD(2) | RSVD(3) | RSVD(4) | NUMEP2 },
 	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EP06, 0xff, 0, 0) },
+#endif
+	
+
 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_6001) },
 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_CMU_300) },
 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_6003),
@@ -1996,6 +2011,10 @@ static struct usb_serial_driver option_1port_device = {
 	.suspend           = usb_wwan_suspend,
 	.resume            = usb_wwan_resume,
 #endif
+#if 1    //added by Quectel 2019-11-5
+  .reset_resume      = usb_wwan_resume, 
+#endif 
+
 };
 
 static struct usb_serial_driver * const serial_drivers[] = {
@@ -2038,6 +2057,46 @@ static int option_probe(struct usb_serial *serial,
 	 */
 	if (device_flags & NUMEP2 && iface_desc->bNumEndpoints != 2)
 		return -ENODEV;
+
+#if 1 //added by Quectel 2019-11-5
+//For USB Auto Suspend 
+  if  (serial->dev->descriptor.idVendor  ==  cpu_to_le16(0x05C6)  && 
+		serial->dev->descriptor.idProduct == cpu_to_le16(0x9090)) {
+    pm_runtime_set_autosuspend_delay(&serial->dev->dev, 3000); 
+    usb_enable_autosuspend(serial->dev); 
+  } 
+  if  (serial->dev->descriptor.idVendor  ==  cpu_to_le16(0x05C6)  && 
+		serial->dev->descriptor.idProduct == cpu_to_le16(0x9003)) { 
+    pm_runtime_set_autosuspend_delay(&serial->dev->dev, 3000); 
+    usb_enable_autosuspend(serial->dev); 
+  } 
+  if  (serial->dev->descriptor.idVendor  ==  cpu_to_le16(0x05C6)  && 
+		serial->dev->descriptor.idProduct == cpu_to_le16(0x9215)) { 
+    pm_runtime_set_autosuspend_delay(&serial->dev->dev, 3000); 
+		usb_enable_autosuspend(serial->dev); 
+  } 
+  if (serial->dev->descriptor.idVendor == cpu_to_le16(0x2C7C)) { 
+    pm_runtime_set_autosuspend_delay(&serial->dev->dev, 3000); 
+    usb_enable_autosuspend(serial->dev); 
+  } 
+  //For USB Remote Wakeup 
+  if  (serial->dev->descriptor.idVendor  ==  cpu_to_le16(0x05C6)  && 
+		serial->dev->descriptor.idProduct == cpu_to_le16(0x9090)) { 
+    device_init_wakeup(&serial->dev->dev, 1); //usb remote wakeup 
+  } 
+  if  (serial->dev->descriptor.idVendor  ==  cpu_to_le16(0x05C6)  && 
+		serial->dev->descriptor.idProduct == cpu_to_le16(0x9003)) { 
+    device_init_wakeup(&serial->dev->dev, 1); //usb remote wakeup 
+  } 
+  if  (serial->dev->descriptor.idVendor  ==  cpu_to_le16(0x05C6)  && 
+		serial->dev->descriptor.idProduct == cpu_to_le16(0x9215)) { 
+    device_init_wakeup(&serial->dev->dev, 1); //usb remote wakeup 
+  } 
+  if (serial->dev->descriptor.idVendor == cpu_to_le16(0x2C7C)) { 
+    device_init_wakeup(&serial->dev->dev, 1); //usb remote wakeup 
+  }
+ 
+#endif
 
 	/* Store the device flags so we can use them during attach. */
 	usb_set_serial_data(serial, (void *)device_flags);
